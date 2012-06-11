@@ -1,4 +1,4 @@
-=  RAILS-TWITTER-OAUTH-SAMPLE
+=  RAILS-TWITTER-OAUTH
 
 
 == Purpose
@@ -42,11 +42,11 @@ NB: for heroku deployment, these are specified in the .gems file in the root of 
       	gem 'oauth'
       
 
-== 3. create a member scaffold
+== 3. create a subscriber scaffold
 
-	ruby g scaffold member provider:string name:string access_token:string access_secret:string profile_image_url:string
+	ruby g scaffold subscriber provider:string name:string access_token:string access_secret:string profile_image_url:string
 
-Member model updated to use screen_name as the key:
+Subscriber model updated to use screen_name as the key:
 
 	def to_param
 		name
@@ -68,11 +68,11 @@ oauth_system.rb
 
 * A controller mixin module to provide twitter oauth support in an application.
 * Uses the TwitterOauth class for oauth functionality.
-* Works specifically with the Member ActiveRecord class to update/verify user details.
+* Works specifically with the Subscriber ActiveRecord class to update/verify user details.
 * It includes wrappers for many of the twitter api methods, basically to reroute errors into the flash hash.
 
 
-== 6. Modify MembersController to use OAuth
+== 6. Modify SubscribersController to use OAuth
 
 	# include the oauth_system mixin
 	include OauthSystem
@@ -81,10 +81,10 @@ oauth_system.rb
 
 == 7. Specify routes
 
-Map members resources
-Hook /members/callback method to module OauthSystem.callback
+Add subscribers resources
+Hook /subscribers/callback method to module OauthSystem.callback
 	
-	resources :members do
+	resources :subscribers do
         collection do
           get "callback"
         end
@@ -92,14 +92,14 @@ Hook /members/callback method to module OauthSystem.callback
 
 
 
-For the sample app, use MembersController.index as the landing page:
+For the sample app, use SubscribersController.index as the landing page:
 	
-	root :to => 'members#index'
+	root :to => 'subscribers#index'
 
 
 == 8. Customise views and controller methods for some basic functionality
 
-MembersController actions
+SubscribersController actions
 
 * index - a basic landing page
 * show - main page for user info if needed
@@ -112,7 +112,7 @@ MembersController actions
 == 9. Add initializers e.g social_network.rb  
 
 Add inside config/initializers/social_network.rb
-demo_proxy_login task connects as the last member and exercises the API a bit
+demo_proxy_login task connects as the last subscriber and exercises the API a bit
 
     # Twitter OAuth settings
     TWOAUTH_SITE = 'https://api.twitter.com'
@@ -129,7 +129,7 @@ Register your application at http://twitter.com/oauth_clients
 
 Be sure to select the following settings in the registration: 
 * Application Type = Browser
-* Callback URL = the fully qualified callback to your app e.g. http://www.your_site_url.com//members/callback
+* Callback URL = the fully qualified callback to your app e.g. http://www.your_site_url.com/subscribers/callback
 * Default Access type = Read & Write (if you want to be able to do things like post status updates)
 * Use Twitter for login = yes
 
@@ -145,5 +145,5 @@ Alternatively, you can edit config/environment.rb to set these directly.
 
 If you are using heroku, add the environment keys using the heroky utility (gem):
 
-	heroku config:add TWOAUTH_KEY=YOUR_TWITTER_COUNSUMER_KEY TWOAUTH_SECRET=YOUR_TWITTER_COUNSUMER_SECRET_KEY TWOAUTH_CALLBACK=http://www.your_site_url.com/members/callback
+	heroku config:add TWOAUTH_KEY=YOUR_TWITTER_COUNSUMER_KEY TWOAUTH_SECRET=YOUR_TWITTER_COUNSUMER_SECRET_KEY TWOAUTH_CALLBACK=http://www.your_site_url.com/subscribers/callback
 	
