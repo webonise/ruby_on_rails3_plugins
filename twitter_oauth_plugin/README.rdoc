@@ -1,0 +1,146 @@
+=  RAILS-TWITTER-OAUTH-SAMPLE
+
+
+== Purpose
+
+Demonstrates the use of rails with the Twitter RESTful API with OAuth 1.0a.
+Uses the oauth ruby gem.
+
+
+== Other References
+
+1. Twitter API documentation - http://apiwiki.twitter.com/
+2. OAuth gem http://github.com/pelle/oauth/tree/master
+3. Twitter OAuth gem (another REST API client library for Ruby - not used in this example) http://github.com/moomerman/twitter_oauth/tree/master
+
+
+== Required gems
+
+These need to be installed in addition to all standard gems required by rails:
+
+* json 
+* oauth 
+
+NB: for heroku deployment, these are specified in the .gems file in the root of the project
+
+
+= STEP-BY-STEP (how the app was created)
+
+== 1. create the application shell
+      
+      	rails rails-twitter-oauth-sample
+      	cd rails-twitter-oauth-sample
+      	rake db:create
+      	bundle install
+	
+
+== 2. Install oauth gem by including it in GEMFILE as given below after adding that do budle install again
+      
+      	gem 'oauth'
+      
+
+== 3. create a member scaffold
+
+	ruby g scaffold member provider:string name:string access_token:string access_secret:string profile_image_url:string
+
+Member model updated to use screen_name as the key:
+
+	def to_param
+		name
+	end
+		
+== 4. Prepare the database
+
+	rake db:migrate
+
+== 5. Include the oauth support by adding twitter_oauth.rb and oauth_system.rb  inside ./lib folder
+
+twitter_oauth.rb
+
+* Implements TwitterOauth class, which is a wrapper around the oauth gem, providing specific support for twitter.
+* As a design principle, the TwitterOauth class logs and re-raises any errors that occur; some custom error classes are defined to suit.
+* It includes implementations for many of the twitter api methods (but not all at this point)
+		
+oauth_system.rb
+
+* A controller mixin module to provide twitter oauth support in an application.
+* Uses the TwitterOauth class for oauth functionality.
+* Works specifically with the Member ActiveRecord class to update/verify user details.
+* It includes wrappers for many of the twitter api methods, basically to reroute errors into the flash hash.
+
+
+== 6. Modify MembersController to use OAuth
+
+	# include the oauth_system mixin
+	include OauthSystem
+	# specify oauth to be on all user-specific actions
+	before_filter :oauth_login_required, :except => [ :callback, :index ]
+
+== 7. Specify routes
+
+Map members resources
+Hook /members/callback method to module OauthSystem.callback
+	
+	resources :members do
+        collection do
+          get "callback"
+        end
+    end
+
+
+
+For the sample app, use MembersController.index as the landing page:
+	
+	root :to => 'members#index'
+
+
+== 8. Customise views and controller methods for some basic functionality
+
+MembersController actions
+
+* index - a basic landing page
+* show - main page for user info if needed
+* partialfriends - xhr responder to render friends list
+* partialfollowers - xhr responder to render followers list 
+* partialmentions - xhr responder to render mentions list
+* partialdms - xhr responder to render direct messages list
+
+	
+== 9. Add initializers e.g social_network.rb  
+
+Add inside config/initializers/social_network.rb
+demo_proxy_login task connects as the last member and exercises the API a bit
+
+    # Twitter OAuth settings
+    TWOAUTH_SITE = 'https://api.twitter.com'
+    # Twitter OAuth callback default
+    TWOAUTH_CALLBACK = 'http://www.your_site_url.com/home/callback'
+    # Twitter OAuth Consumer key
+    TWOAUTH_KEY = 'YOUR_TWITTER_COUNSUMER_KEY'
+    # Twitter OAuth Consumer secret
+    TWOAUTH_SECRET = 'YOUR_TWITTER_COUNSUMER_SECRET_KEY'
+
+== 10. Configuring twitter application keys
+
+Register your application at http://twitter.com/oauth_clients
+
+Be sure to select the following settings in the registration: 
+* Application Type = Browser
+* Callback URL = the fully qualified callback to your app e.g. http://www.your_site_url.com//members/callback
+* Default Access type = Read & Write (if you want to be able to do things like post status updates)
+* Use Twitter for login = yes
+
+Note the "application key" and "consumer secret" numbers that twitter generates - these are unique for your application
+and are required to complete the configuration.
+
+Add the twitter application key and consumer secret as operating system environment variables
+(TWOAUTH_KEY and TWOAUTH_SECRET respectively).
+
+Set your callback URL as operating system environment variable (TWOAUTH_CALLBACK).
+ 
+Alternatively, you can edit config/environment.rb to set these directly.
+
+If you are using heroku, add the environment keys using the heroky utility (gem):
+
+	heroku config:add TWOAUTH_KEY=YOUR_TWITTER_COUNSUMER_KEY TWOAUTH_SECRET=YOUR_TWITTER_COUNSUMER_SECRET_KEY TWOAUTH_CALLBACK=http://www.your_site_url.com/members/callback
+	
