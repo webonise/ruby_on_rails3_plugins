@@ -9,7 +9,9 @@ Then using users access key and secert key we can tweet to user's account as usi
 Also this act like viral tweet network to count how many twets done from the current app to different users.
 We can render user's friends list,render followers list,render mentions list and render direct messages list
 
-
+== To see all notes and comments list. Which is listed inside these 2 libraries just type in console
+        cd rails-twitter-oauth
+        rake notes
 == Other References
 
 1. Twitter API documentation - http://apiwiki.twitter.com/
@@ -31,8 +33,8 @@ NB: for heroku deployment, these are specified in the .gems file in the root of 
 
 == 1. create the application shell
       
-      	rails rails-twitter-oauth-sample
-      	cd rails-twitter-oauth-sample
+      	rails new rails-twitter-oauth
+      	cd rails-twitter-oauth
       	rake db:create
       	bundle install
 	
