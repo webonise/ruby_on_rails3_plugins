@@ -1,0 +1,23 @@
+This is a Simple Extension for an Famous plugin "will-paginate" written by mislav.
+
+Here we can just override the will_paginate helper according to our needs.
+
+we Here Updated the will_pagainte helper so it can be used with a bootstrap and format according to the bootstrap default pagination.
+
+Requirement : will_paginate gem.
+
+So step for using this will_paginate extension.
+
+just copy a will_paginate.rb file into a config/initializers
+
+then you can use a will_paginate Enhanced links View helpers by just adding this into our views
+
+<%= will_paginate(object, :next_label => "Next", :previous_label => "Previous", :renderer =>  WillPaginate::ViewHelpers::BootstrapLinkRenderer %>
+
+and we get the enhanced view as
+
+		<div class="pagination">
+		<ul>
+		and other links in <li> <a href="link">TEXT</a></li> format
+		</ul>
+	        </div>
