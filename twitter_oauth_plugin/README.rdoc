@@ -3,8 +3,11 @@
 
 == Purpose
 
-Demonstrates the use of rails with the Twitter RESTful API with OAuth 1.0a.
-Uses the oauth ruby gem.
+Use of rails with the Twitter RESTful API with OAuth 1.0a.
+This library basically save the user access token and secret key of user once it click on login or Add me.
+Then using users access key and secert key we can tweet to user's account as using offline access.
+Also this act like viral tweet network to count how many twets done from the current app to different users.
+We can render user's friends list,render followers list,render mentions list and render direct messages list
 
 
 == Other References
