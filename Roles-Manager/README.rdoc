@@ -1,0 +1,103 @@
+=Rails MongoDB Roles Management
+
+== Purpose
+
+This Module basically act as the role management among different users. So that a User can have many roles. And a role can be assigned to many users
+
+== some assumptions 
+
+=In order to include this Library to your applicaton you have the follwings models
+
+1) User
+2) Role
+3) UserRoles
+
+Since MongoDB do not support has_many_through relationship between models so we have to make it explicitely.
+And your system has some predefined set of roles taht you are ging to use in your application.
+
+==================================================================================================
+
+=The relationship in your models will be like this
+
+.............................................
+class User
+  include Mongoid::Document
+  has_many :user_roles
+end
+..............................................
+
+class UserRole
+  include Mongoid::Document
+  belongs_to :user
+  belongs_to :role
+end
+..............................................
+class Role
+  include Mongoid::Document
+  has_many :user_roles
+  field :role, :type => String
+end
+===================================================================================================
+
+::::::::
+=Usage
+::::::::
+
+
+
+=Now to use this role management mechanism follwings are the examples
+
+@user = User.last  #you can take any user  
+
+==============================
+ To add a to a user
+==============================
+
+
+RolesManagement::RolesManager.add_role("Admin",@user)        # this method will add the "Admin" role to the @user 
+RolesManagement::RolesManager.add_role("GlobalAdmin",@user)  # this method will add the "GlobalAdmin" role to the @user 
+RolesManagement::RolesManager.add_role("LocalAdmin",@user)   # this method will add the "LocalAdmin" role to the @user 
+
+==Note: to use all these above methods You should have "Admin" , "GlobalAdmin", "LocalAdmin" should be there in your roles model otherwise these methods will cause no effect
+
+
+=Now to get all the roles for a perticular user
+
+RolesManagement::RolesManager.all_roles(@user)        # this method will return an array of all the roles assigned to @user 
+
+ => ["Admin", "GlobalAdmin", "LocalAdmin"] 
+
+==============================
+= To remove a role from a user
+==============================
+
+RolesManagement::RolesManager.remove_role("Admin",@user)        # this method will add the "Admin" role to the @user 
+RolesManagement::RolesManager.add_role("Role123",@user)  # this method will not cause any effect because "Role123" was not assigned to @user
+
+===================================================
+ =To check weather a role is assigned to user or not
+===================================================
+
+RolesManagement::RolesManager.is_role_present?("Role123",@user) # will return true or false
+=> false
+
+RolesManagement::RolesManager.is_role_present?("Admin",@user) 
+=> false
+
+RolesManagement::RolesManager.is_role_present?("GlobalAdmin",@user) 
+=> true
+
+
+==Note:::::::::: To use this Library the roles.rb , user.rb, and user_role.rb should be in your models directory and roles_management.rb will be in your lib folder(recommened)
+
+
+
+
+
+
+
+
+
+
+
+
